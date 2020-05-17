@@ -20,7 +20,7 @@ func minInt(a int, b int) int {
 	}
 }
 
-func calcrateDot(x []float64, y []float64) float64 {
+func calclateDot(x []float64, y []float64) float64 {
 	result := 0.0;
 	for i := 0; i < len(x); i++ {
 		result += x[i] * y[i]
@@ -38,10 +38,10 @@ func cos_similarity(sample []float64, training []float64) float64 {
 	// target_traingin
 	tt := training[0:target_len]
 
-	return calcrateDot(ts, tt) / (math.Sqrt(calcrateDot(ts, ts)) * math.Sqrt(calcrateDot(tt, tt)))
+	return calclateDot(ts, tt) / (math.Sqrt(calclateDot(ts, ts)) * math.Sqrt(calclateDot(tt, tt)))
 }
 
-func calcratePowerSpctrum(fileName string) []float64 {
+func calclatePowerSpctrum(fileName string) []float64 {
 	// ファイルのオープン
 	file, err := os.Open(fileName)
 	if err != nil {
@@ -80,7 +80,7 @@ func calcratePowerSpctrum(fileName string) []float64 {
 }
 
 func Sample() {
-	training := calcratePowerSpctrum("./media/nansu.wav")
-	sample := calcratePowerSpctrum("./media/myvoice.wav")
+	training := calclatePowerSpctrum("./media/nansu.wav")
+	sample := calclatePowerSpctrum("./media/myvoice.wav")
 	fmt.Println(cos_similarity(sample, training))
 }

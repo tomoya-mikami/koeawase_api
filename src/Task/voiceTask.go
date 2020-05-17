@@ -23,6 +23,9 @@ func (v VoiceTask) Execute(taskName string, args []string) {
 		case "add":
 			addVoice(v, args)
 			break
+		case "calclateSmilarity":
+			calclateSmilarity(v, args)
+			break
 		default:
 			log.Fatal("not found task")
 	}
@@ -41,7 +44,7 @@ func addVoice(v VoiceTask, args []string) {
 		log.Fatal(err)
 	}
 
-	powerSpectrum := v.voiceService.CalcratePowerSpectrum(file)
+	powerSpectrum := v.voiceService.CalclatePowerSpectrum(file)
 	voice, err := v.voiceService.Add(name, powerSpectrum)
 	if err != nil {
 		log.Fatal(err)
@@ -52,6 +55,33 @@ func addVoice(v VoiceTask, args []string) {
 		voice.ID,
 		voice.Name,
 		len(voice.PowerSpectrum),
+	)
+
+	fmt.Println(str)
+}
+
+func calclateSmilarity(v VoiceTask, args []string) {
+	if len(args) != 2 {
+		log.Fatal("provide filename usage: go run main.go cli voice calclateSmilarity $id1 $id2")
+	}
+	id1 := args[0]
+	id2 := args[1]
+
+	sample, err := v.voiceService.Get(id1)
+	training, err := v.voiceService.Get(id2)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	calcResult := v.voiceService.CosSimilarity(
+		sample.PowerSpectrum,
+		training.PowerSpectrum,
+	)
+	str := fmt.Sprintf(
+		"%sさんと%sさんの声の類似度は%fです",
+		sample.Name,
+		training.Name,
+		calcResult,
 	)
 
 	fmt.Println(str)
