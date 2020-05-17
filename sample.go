@@ -79,7 +79,7 @@ func calcratePowerSpctrum(fileName string) []float64 {
 	return powerSpectrum
 }
 
-func main() {
+func Sample() {
 	training := calcratePowerSpctrum("./media/nansu.wav")
 	sample := calcratePowerSpctrum("./media/myvoice.wav")
 	fmt.Println(cos_similarity(sample, training))

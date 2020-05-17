@@ -13,3 +13,11 @@ stop:
 .PHONY: firestore-start
 firestore-start:
 	gcloud beta emulators firestore start --host-port=localhost:8812
+
+.PHONY: wire
+wire:
+	$(GOPATH)/bin/wire
+
+.PHONY: bash
+bash:
+	docker exec -it api bash
