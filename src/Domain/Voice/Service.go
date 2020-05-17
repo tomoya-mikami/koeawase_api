@@ -11,7 +11,7 @@ import (
 )
 
 type ServiceInterface interface {
-	CalclatePowerSpectrum(*os.File) []float64
+	CalculatePowerSpectrum(*os.File) []float64
 	CosSimilarity(sample []float64, training []float64) float64
 	Add(name string, powerSpectrum []float64) (*Voice, error)
 	Get(id string) (Voice, error)
@@ -38,7 +38,7 @@ func (s Service) Get(id string) (Voice, error) {
 	return s.repository.Get(id)
 }
 
-func (s Service) CalclatePowerSpectrum(file *os.File) []float64 {
+func (s Service) CalculatePowerSpectrum(file *os.File) []float64 {
 	// Wavファイルの読み込み 
 	reader := wav.NewReader(file)
 
@@ -80,7 +80,7 @@ func (s Service) CosSimilarity(sample []float64, training []float64) float64 {
 	// target_traingin
 	tt := training[0:target_len]
 
-	return calclateDot(ts, tt) / (math.Sqrt(calclateDot(ts, ts)) * math.Sqrt(calclateDot(tt, tt)))
+	return calculateDot(ts, tt) / (math.Sqrt(calculateDot(ts, ts)) * math.Sqrt(calculateDot(tt, tt)))
 }
 
 func minInt(a int, b int) int {
@@ -91,7 +91,7 @@ func minInt(a int, b int) int {
 	}
 }
 
-func calclateDot(x []float64, y []float64) float64 {
+func calculateDot(x []float64, y []float64) float64 {
 	result := 0.0;
 	for i := 0; i < len(x); i++ {
 		result += x[i] * y[i]
