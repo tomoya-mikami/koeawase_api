@@ -71,14 +71,10 @@ func (s Service) CalculatePowerSpectrum(file *os.File) []float64 {
 }
 
 func (s Service) CosSimilarity(sample []float64, training []float64) float64 {
-	sample_len := len(sample)
-	training_len := len(training)
-	target_len := minInt(sample_len, training_len)
-
 	// target_sample
-	ts := sample[0:target_len]
+	ts := sample[LOW_FREQUENCY:HIGH_FREQUENCY]
 	// target_traingin
-	tt := training[0:target_len]
+	tt := training[LOW_FREQUENCY:HIGH_FREQUENCY]
 
 	return calculateDot(ts, tt) / (math.Sqrt(calculateDot(ts, ts)) * math.Sqrt(calculateDot(tt, tt)))
 }
