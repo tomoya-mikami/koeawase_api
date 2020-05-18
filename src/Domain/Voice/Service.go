@@ -1,17 +1,17 @@
 package Voice
 
 import (
-	"os"
 	"io"
 	"math/cmplx"
 	"math"
+	"mime/multipart"
 
 	"github.com/mjibson/go-dsp/fft"
 	"github.com/youpy/go-wav"
 )
 
 type ServiceInterface interface {
-	CalculatePowerSpectrum(*os.File) []float64
+	CalculatePowerSpectrum(multipart.File) []float64
 	CosSimilarity(sample []float64, training []float64) float64
 	Add(name string, powerSpectrum []float64) (*Voice, error)
 	Get(id string) (Voice, error)
@@ -38,7 +38,7 @@ func (s Service) Get(id string) (Voice, error) {
 	return s.repository.Get(id)
 }
 
-func (s Service) CalculatePowerSpectrum(file *os.File) []float64 {
+func (s Service) CalculatePowerSpectrum(file multipart.File) []float64 {
 	// Wavファイルの読み込み 
 	reader := wav.NewReader(file)
 
