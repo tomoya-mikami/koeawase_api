@@ -10,6 +10,7 @@ import (
 	Voice "local.packages/voice"
 	Task "local.packages/task"
 	Src "local.packages/src"
+	Handler "local.packages/handler"
 )
 
 func InitializeCLI(client *firestore.Client, ctx context.Context) (*Src.CLI, error) {
@@ -18,6 +19,17 @@ func InitializeCLI(client *firestore.Client, ctx context.Context) (*Src.CLI, err
 		Voice.NewService,
 		Task.NewVoiceTask,
 		Src.NewCLI,
+	)
+
+	return nil, nil
+}
+
+func InitializeServer(client *firestore.Client, ctx context.Context) (*Src.Server, error) {
+	wire.Build(
+		Voice.NewRepository,
+		Voice.NewService,
+		Handler.NewVoiceHandler,
+		Src.NewServer,
 	)
 
 	return nil, nil

@@ -8,6 +8,7 @@ package main
 import (
 	"cloud.google.com/go/firestore"
 	"context"
+	"local.packages/handler"
 	"local.packages/src"
 	"local.packages/task"
 	"local.packages/voice"
@@ -21,4 +22,12 @@ func InitializeCLI(client *firestore.Client, ctx context.Context) (*src.CLI, err
 	voiceTask := Task.NewVoiceTask(serviceInterface)
 	cli := src.NewCLI(voiceTask)
 	return cli, nil
+}
+
+func InitializeServer(client *firestore.Client, ctx context.Context) (*src.Server, error) {
+	repositoryInterface := Voice.NewRepository(client, ctx)
+	serviceInterface := Voice.NewService(repositoryInterface)
+	voiceHandler := Handler.NewVoiceHandler(serviceInterface)
+	server := src.NewServer(voiceHandler)
+	return server, nil
 }

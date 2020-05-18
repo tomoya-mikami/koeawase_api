@@ -8,6 +8,8 @@ replace local.packages/task => ./src/Task
 
 replace local.packages/src => ./src
 
+replace local.packages/handler => ./src/Handler
+
 require (
 	cloud.google.com/go/firestore v1.2.0
 	github.com/gofiber/fiber v1.9.6
@@ -16,6 +18,7 @@ require (
 	github.com/youpy/go-wav v0.0.0-20160223082350-b63a9887d320
 	gonum.org/v1/gonum v0.7.0
 	google.golang.org/api v0.20.0
+	local.packages/handler v0.0.0-00010101000000-000000000000
 	local.packages/src v0.0.0-00010101000000-000000000000
 	local.packages/task v0.0.0-00010101000000-000000000000
 	local.packages/voice v0.0.0-00010101000000-000000000000

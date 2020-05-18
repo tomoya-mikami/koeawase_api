@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"cloud.google.com/go/firestore"
-	"github.com/gofiber/fiber"
 )
 
 func main() {
@@ -27,12 +26,10 @@ func main() {
 			cli.Execute(os.Args)
 		}
 	} else {
-		app := fiber.New()
-
-		app.Get("/", func(c *fiber.Ctx) {
-			c.Send("Hello, World!")
-		})
-
-		app.Listen(8080)
+		server, err := InitializeServer(client, ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+		server.Start()
 	}
 }
