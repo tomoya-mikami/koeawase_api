@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>similarity</title>
+</head>
+
+<body>
+  <div>
+    {{.Name}}さんとどれくらい声が似ているかを計算します<br>
+    好きな名前を入力して「こんばんわ」と言ってください
+  </div>
+  <form method="POST" action="/register" enctype="multipart/form-data">
+    <input type="text" name="name" value="Hello" /><br>
+    <input type="file" name="voice" /><br>
+    <input type="submit" value="SUBMIT" />
+  </form>
+</body>
+
+</html>

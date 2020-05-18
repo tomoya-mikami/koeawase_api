@@ -19,5 +19,6 @@ func NewServer(voiceHandler *Handler.VoiceHandler) *Server {
 func (s Server) Start() {
 	http.HandleFunc("/", s.voiceHandler.Index)
 	http.HandleFunc("/register", s.voiceHandler.Register)
+	http.HandleFunc("/similarity", s.voiceHandler.Similarity)
 	http.ListenAndServe(":8080", nil)
 }

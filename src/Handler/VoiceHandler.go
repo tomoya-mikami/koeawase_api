@@ -79,3 +79,31 @@ func (h VoiceHandler) Register(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 }
+
+func (h VoiceHandler) Similarity(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		samples, ok := r.URL.Query()["sample"]
+
+		if !ok || len(samples[0]) < 1 {
+			log.Println("Url Param 'sample' is missing")
+			return
+		}
+
+		sample := samples[0]
+
+		voice, err := h.voiceService.Get(sample)
+		if err != nil {
+			panic(err)
+		}
+
+		template, err := createTemplate("similarity.html")
+		if err != nil {
+			panic(err)
+		}
+
+		err = template.Execute(w, voice)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
