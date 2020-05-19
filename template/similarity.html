@@ -11,7 +11,8 @@
     {{.Name}}さんとどれくらい声が似ているかを計算します<br>
     好きな名前を入力して「こんばんわ」と言ってください
   </div>
-  <form method="POST" action="/register" enctype="multipart/form-data">
+  <form method="POST" action="/similarity" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="{{.ID}}">
     <input type="text" name="name" value="Hello" /><br>
     <input type="file" name="voice" /><br>
     <input type="submit" value="SUBMIT" />

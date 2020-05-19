@@ -43,5 +43,6 @@ func (r Repository) Get(id string) (Voice, error) {
 
 	var voice Voice
 	dsnap.DataTo(&voice)
+	voice.ID = id
 	return voice, err
 }

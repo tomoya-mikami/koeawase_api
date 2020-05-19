@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>result</title>
+</head>
+
+<body>
+  <div>
+    {{.Name}}さんと{{.TrainingName}}さんの声の類似度は{{.Similarity}}%です<br>
+    以下のURLを共有してあなたと似た声の友達を探しましょう!<br>
+    localhost:8080/similarity?sample={{.ID}}
+  </div>
+</body>
+
+</html>

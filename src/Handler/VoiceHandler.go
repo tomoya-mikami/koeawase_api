@@ -1,7 +1,6 @@
 package Handler
 
 import (
-	"os"
 	"log"
 	"net/http"
 	"text/template"
@@ -16,6 +15,20 @@ const TEMPLATE_PATH = "template/"
 
 func createTemplate(templateName string) (*template.Template, error) {
 	return template.ParseFiles(TEMPLATE_PATH + templateName)
+}
+
+func registerPostVoice(h VoiceHandler, w http.ResponseWriter, r *http.Request) (* Voice.Voice, error) {
+	file, _, err := r.FormFile("voice")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return nil, err
+	}
+	defer file.Close()
+
+	name := r.FormValue("name")
+
+	powerSpectrum := h.voiceService.CalculatePowerSpectrum(file)
+	return h.voiceService.Add(name, powerSpectrum)
 }
 
 func NewVoiceHandler(voiceService Voice.ServiceInterface) *VoiceHandler {
@@ -43,18 +56,7 @@ type RegisterResponse struct {
 }
 
 func (h VoiceHandler) Register(w http.ResponseWriter, r *http.Request) {
-	file, _, err := r.FormFile("voice")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	defer file.Close()
-
-	name := r.FormValue("name")
-	log.Print(name)
-
-	powerSpectrum := h.voiceService.CalculatePowerSpectrum(file)
-	voice, err := h.voiceService.Add(name, powerSpectrum)
+	voice, err := registerPostVoice(h, w, r)
 	if err != nil {
 		panic(err)
 	}
@@ -64,20 +66,23 @@ func (h VoiceHandler) Register(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	hostName, err := os.Hostname()
-	if err != nil {
-		panic(err)
-	}
-
 	response := new(RegisterResponse)
 	response.ID = voice.ID
 	response.Name = voice.Name
-	response.Host = hostName
+	response.Host = r.Header.Get("HOST")
 
 	err = template.Execute(w, response)
 	if err != nil {
 		panic(err)
 	}
+}
+
+type SimilarityResponse struct {
+	ID string
+	Name string
+	TrainingName string
+	Similarity int
+	Host string
 }
 
 func (h VoiceHandler) Similarity(w http.ResponseWriter, r *http.Request) {
@@ -102,6 +107,36 @@ func (h VoiceHandler) Similarity(w http.ResponseWriter, r *http.Request) {
 		}
 
 		err = template.Execute(w, voice)
+		if err != nil {
+			panic(err)
+		}
+	} else if r.Method == http.MethodPost {
+		voice, err := registerPostVoice(h, w, r)
+		if err != nil {
+			panic(err)
+		}
+
+		// cosine類似度の計算
+		ID := r.FormValue("id")
+		training, err := h.voiceService.Get(ID)
+		if err != nil {
+			panic(err)
+		}
+
+		similarity := h.voiceService.CosSimilarity(voice.PowerSpectrum, training.PowerSpectrum)
+		response := new(SimilarityResponse)
+		response.ID = voice.ID
+		response.Name = voice.Name
+		response.TrainingName = training.Name
+		response.Similarity = int(similarity * 100)
+		response.Host = r.Header.Get("HOST")
+
+		template, err := createTemplate("result.html")
+		if err != nil {
+			panic(err)
+		}
+
+		err = template.Execute(w, response)
 		if err != nil {
 			panic(err)
 		}
