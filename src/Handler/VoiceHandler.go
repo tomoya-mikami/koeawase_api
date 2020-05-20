@@ -2,6 +2,7 @@ package Handler
 
 import (
 	"log"
+	"os"
 	"net/http"
 	"text/template"
 	Voice "local.packages/voice"
@@ -92,7 +93,7 @@ func (h VoiceHandler) Register(w http.ResponseWriter, r *http.Request) {
 	response := new(RegisterResponse)
 	response.ID = voice.ID
 	response.Name = voice.Name
-	response.Host = r.Header.Get("HOST")
+	response.Host = os.Getenv("MY_HOST_NAME")
 
 	err = template.Execute(w, response)
 	if err != nil {
@@ -165,7 +166,7 @@ func (h VoiceHandler) Similarity(w http.ResponseWriter, r *http.Request) {
 		response.Name = voice.Name
 		response.TrainingName = training.Name
 		response.Similarity = int(similarity.Similarity * 100)
-		response.Host = r.Header.Get("HOST")
+		response.Host = os.Getenv("MY_HOST_NAME")
 
 		template, err := createTemplate("result.html")
 		if err != nil {

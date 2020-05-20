@@ -4,7 +4,7 @@ build:
 
 .PHONY: run
 run:
-	docker run -p 8080:8080 -e FIRESTORE_EMULATOR_HOST=host.docker.internal:8812 -v $(PWD):/workdir --name api --rm koeawase_api
+	docker run -p 8080:8080 -e FIRESTORE_EMULATOR_HOST=host.docker.internal:8812 -e MY_HOST_NAME=localhost:8080 -v $(PWD):/workdir --name api --rm koeawase_api
 
 .PHONY: stop
 stop:

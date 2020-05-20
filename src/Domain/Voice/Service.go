@@ -67,16 +67,15 @@ func (s Service) CalculatePowerSpectrum(file multipart.File) []float64 {
 		powerSpectrum = append(powerSpectrum, cmplx.Abs(r))
 	}
 
-	return powerSpectrum
+	// 人間の音声の周波数帯は100~2000hzなのでその範囲で取得する
+	// 後々の配列 -> 文字列変換が非常に遅くなるため
+	return powerSpectrum[LOW_FREQUENCY:HIGH_FREQUENCY]
 }
 
 func (s Service) CosSimilarity(sample []float64, training []float64) float64 {
-	// target_sample
-	ts := sample[LOW_FREQUENCY:HIGH_FREQUENCY]
-	// target_traingin
-	tt := training[LOW_FREQUENCY:HIGH_FREQUENCY]
-
-	return calculateDot(ts, tt) / (math.Sqrt(calculateDot(ts, ts)) * math.Sqrt(calculateDot(tt, tt)))
+	sSize := math.Sqrt(calculateDot(sample, sample))
+	tSize := math.Sqrt(calculateDot(training, training))
+	return calculateDot(sample, training) / (sSize * tSize)
 }
 
 func minInt(a int, b int) int {
