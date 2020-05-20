@@ -21,3 +21,11 @@ wire:
 .PHONY: bash
 bash:
 	docker exec -it api bash
+
+.PHONY: set-project
+set-project:
+	gcloud config set project koeawase
+
+.PHONY: deploy
+deploy:
+	gcloud app deploy

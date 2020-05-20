@@ -159,7 +159,7 @@ func (h VoiceHandler) Similarity(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		similarity, err := h.similarityService.CalcurateSimilarity(voice, &training)
+		similarity, err := h.similarityService.CalcurateSimilarity(voice, training)
 		response := new(SimilarityResponse)
 		response.ID = similarity.ID
 		response.Name = voice.Name

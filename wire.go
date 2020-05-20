@@ -3,15 +3,15 @@
 package main
 
 import (
+	"cloud.google.com/go/firestore"
 	"context"
 	"github.com/google/wire"
-	"cloud.google.com/go/firestore"
 
-	Voice "local.packages/voice"
-	Similarity "local.packages/similarity"
-	Task "local.packages/task"
-	Src "local.packages/src"
 	Handler "local.packages/handler"
+	Similarity "local.packages/similarity"
+	Src "local.packages/src"
+	Task "local.packages/task"
+	Voice "local.packages/voice"
 )
 
 func InitializeCLI(client *firestore.Client, ctx context.Context) (*Src.CLI, error) {

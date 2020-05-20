@@ -14,7 +14,7 @@ type ServiceInterface interface {
 	CalculatePowerSpectrum(multipart.File) []float64
 	CosSimilarity(sample []float64, training []float64) float64
 	Add(name string, powerSpectrum []float64) (*Voice, error)
-	Get(id string) (Voice, error)
+	Get(id string) (*Voice, error)
 }
 
 type Service struct {
@@ -34,7 +34,7 @@ func (s Service) Add(name string, powerSpectrum []float64) (*Voice, error) {
 	return s.repository.Add(voice)
 }
 
-func (s Service) Get(id string) (Voice, error) {
+func (s Service) Get(id string) (*Voice, error) {
 	return s.repository.Get(id)
 }
 

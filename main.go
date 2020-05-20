@@ -1,15 +1,15 @@
 package main
 
 import (
+	"cloud.google.com/go/firestore"
 	"context"
 	"log"
 	"os"
-	"cloud.google.com/go/firestore"
 )
 
 func main() {
 	ctx := context.Background()
-	client, err := firestore.NewClient(ctx, "planbbs")
+	client, err := firestore.NewClient(ctx, "koeawase")
 	if err != nil {
 		log.Fatalln(err)
 	}

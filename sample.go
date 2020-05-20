@@ -1,19 +1,19 @@
 package main
 
 import (
-	"log"
 	"fmt"
-	"math/cmplx"
-	"math"
-	"os"
 	"io"
+	"log"
+	"math"
+	"math/cmplx"
+	"os"
 
 	"github.com/mjibson/go-dsp/fft"
 	"github.com/youpy/go-wav"
 )
 
 func minInt(a int, b int) int {
-	if (a < b) {
+	if a < b {
 		return a
 	} else {
 		return b
@@ -21,7 +21,7 @@ func minInt(a int, b int) int {
 }
 
 func calculateDot(x []float64, y []float64) float64 {
-	result := 0.0;
+	result := 0.0
 	for i := 0; i < len(x); i++ {
 		result += x[i] * y[i]
 	}
@@ -48,7 +48,7 @@ func calculatePowerSpctrum(fileName string) []float64 {
 		log.Fatal(err)
 	}
 
-	// Wavファイルの読み込み 
+	// Wavファイルの読み込み
 	reader := wav.NewReader(file)
 
 	defer file.Close()

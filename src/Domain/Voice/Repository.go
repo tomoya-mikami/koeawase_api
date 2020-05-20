@@ -8,7 +8,7 @@ import (
 
 type RepositoryInterface interface {
 	Add(voice *Voice) (*Voice, error)
-	Get(id string) (Voice, error)
+	Get(id string) (*Voice, error)
 }
 
 type Repository struct {
@@ -24,7 +24,10 @@ func NewRepository(client *firestore.Client, ctx context.Context) RepositoryInte
 }
 
 func (r Repository) Add(voice *Voice) (*Voice, error) {
-	docRef, _, err := r.client.Collection("Voices").Add(r.ctx, voice)
+	voiceFirestore := new(VoiceFireStore)
+	voiceFirestore.Name = voice.Name
+	voiceFirestore.PowerSpectrum = ConvertFloatArrayToString(voice.PowerSpectrum)
+	docRef, _, err := r.client.Collection("Voices").Add(r.ctx, voiceFirestore)
 	if err != nil {
 		return voice, err
 	}
@@ -33,15 +36,18 @@ func (r Repository) Add(voice *Voice) (*Voice, error) {
 	return voice, err
 }
 
-func (r Repository) Get(id string) (Voice, error) {
+func (r Repository) Get(id string) (*Voice, error) {
 	dsnap, err := r.client.Collection("Voices").Doc(id).Get(r.ctx)
 	if err != nil {
 		log.Print(err)
-		return Voice{}, err
+		return nil, err
 	}
 
-	var voice Voice
-	dsnap.DataTo(&voice)
+	var voiceFireStore VoiceFireStore
+	dsnap.DataTo(&voiceFireStore)
+	voice := new(Voice)
+	voice.Name = voiceFireStore.Name
+	voice.PowerSpectrum = ConvertStringToFloatArray(voiceFireStore.PowerSpectrum)
 	voice.ID = id
 	return voice, err
 }

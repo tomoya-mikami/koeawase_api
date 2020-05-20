@@ -79,7 +79,7 @@ func calculateSimilarity(v VoiceTask, args []string) {
 		log.Fatal(err)
 	}
 
-	calcResult, err := v.similarityService.CalcurateSimilarity(&sample, &training)
+	calcResult, err := v.similarityService.CalcurateSimilarity(sample, training)
 	if err != nil {
 		log.Fatal(err)
 	}
