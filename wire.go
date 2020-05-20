@@ -8,6 +8,7 @@ import (
 	"cloud.google.com/go/firestore"
 
 	Voice "local.packages/voice"
+	Similarity "local.packages/similarity"
 	Task "local.packages/task"
 	Src "local.packages/src"
 	Handler "local.packages/handler"
@@ -17,6 +18,8 @@ func InitializeCLI(client *firestore.Client, ctx context.Context) (*Src.CLI, err
 	wire.Build(
 		Voice.NewRepository,
 		Voice.NewService,
+		Similarity.NewRepository,
+		Similarity.NewService,
 		Task.NewVoiceTask,
 		Src.NewCLI,
 	)

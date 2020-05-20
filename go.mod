@@ -1,8 +1,10 @@
 module github.com/tomoya-paseri/koeawase_api
 
-go 1.13
+go 1.12
 
 replace local.packages/voice => ./src/Domain/Voice
+
+replace local.packages/similarity => ./src/Domain/Similarity
 
 replace local.packages/task => ./src/Task
 
@@ -19,6 +21,7 @@ require (
 	gonum.org/v1/gonum v0.7.0
 	google.golang.org/api v0.20.0
 	local.packages/handler v0.0.0-00010101000000-000000000000
+	local.packages/similarity v0.0.0-00010101000000-000000000000
 	local.packages/src v0.0.0-00010101000000-000000000000
 	local.packages/task v0.0.0-00010101000000-000000000000
 	local.packages/voice v0.0.0-00010101000000-000000000000

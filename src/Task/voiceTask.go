@@ -6,15 +6,21 @@ import (
 	"fmt"
 
 	Voice "local.packages/voice"
+	Similarity "local.packages/similarity"
 )
 
 type VoiceTask struct {
 	voiceService Voice.ServiceInterface
+	similarityService Similarity.ServiceInterface
 }
 
-func NewVoiceTask(voiceService Voice.ServiceInterface) *VoiceTask {
+func NewVoiceTask(
+	voiceService Voice.ServiceInterface,
+	similarityService Similarity.ServiceInterface,
+) *VoiceTask {
 	cli := new(VoiceTask)
 	cli.voiceService = voiceService
+	cli.similarityService = similarityService
 	return cli
 }
 
@@ -73,15 +79,16 @@ func calculateSimilarity(v VoiceTask, args []string) {
 		log.Fatal(err)
 	}
 
-	calcResult := v.voiceService.CosSimilarity(
-		sample.PowerSpectrum,
-		training.PowerSpectrum,
-	)
+	calcResult, err := v.similarityService.CalcurateSimilarity(&sample, &training)
+	if err != nil {
+		log.Fatal(err)
+	}
 	str := fmt.Sprintf(
-		"%sさんと%sさんの声の類似度は%fです",
-		sample.Name,
-		training.Name,
-		calcResult,
+		"%sさんと%sさんの声の類似度は%fです (firestore doc ID %s)",
+		calcResult.Name1,
+		calcResult.Name2,
+		calcResult.Similarity,
+		calcResult.ID,
 	)
 
 	fmt.Println(str)

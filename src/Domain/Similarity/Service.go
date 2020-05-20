@@ -13,9 +13,16 @@ type Service struct {
 	repository RepositoryInterface
 }
 
+func NewService(repository RepositoryInterface) ServiceInterface {
+	service := new(Service)
+	service.repository = repository
+	return service
+}
+
 func (s Service) CalcurateSimilarity(sample *Voice.Voice, training *Voice.Voice) (*Similarity, error) {
 	cosSimilarity := cosSimilarity(sample.PowerSpectrum, training.PowerSpectrum)
 	result := new(Similarity)
+	result.Name1ID = sample.ID
 	result.Name1 = sample.Name
 	result.Name2 = training.Name
 	result.Similarity = cosSimilarity

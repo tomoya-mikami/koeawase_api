@@ -1,10 +1,12 @@
 module src
 
-go 1.13
+go 1.12
 
 replace local.packages/task => ./Task
 
 replace local.packages/voice => ./Domain/Voice
+
+replace local.packages/similarity => ./Domain/Similarity
 
 replace local.packages/handler => ./Handler
 
