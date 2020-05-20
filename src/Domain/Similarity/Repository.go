@@ -26,7 +26,6 @@ func NewRepository(client *firestore.Client, ctx context.Context) RepositoryInte
 func (r Repository) Add(similarity *Similarity) (*Similarity, error) {
 	docRef, _, err := r.client.Collection("Similarities").Add(r.ctx, similarity)
 	if err != nil {
-		log.Fatal(err)
 		return similarity, err
 	}
 	similarity.ID = docRef.ID

@@ -26,7 +26,6 @@ func NewRepository(client *firestore.Client, ctx context.Context) RepositoryInte
 func (r Repository) Add(voice *Voice) (*Voice, error) {
 	docRef, _, err := r.client.Collection("Voices").Add(r.ctx, voice)
 	if err != nil {
-		log.Fatal(err)
 		return voice, err
 	}
 	voice.ID = docRef.ID
