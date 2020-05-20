@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"text/template"
 	Voice "local.packages/voice"
+	Similarity "local.packages/similarity"
 )
 
 type VoiceHandler struct {
 	voiceService Voice.ServiceInterface
+	similarityService Similarity.ServiceInterface
 }
 
 const TEMPLATE_PATH = "template/"
@@ -31,9 +33,13 @@ func registerPostVoice(h VoiceHandler, w http.ResponseWriter, r *http.Request) (
 	return h.voiceService.Add(name, powerSpectrum)
 }
 
-func NewVoiceHandler(voiceService Voice.ServiceInterface) *VoiceHandler {
+func NewVoiceHandler(
+	voiceService Voice.ServiceInterface,
+	similarityService Similarity.ServiceInterface,
+) *VoiceHandler {
 	handler := new(VoiceHandler)
 	handler.voiceService = voiceService
+	handler.similarityService = similarityService
 	return handler
 }
 
@@ -123,15 +129,58 @@ func (h VoiceHandler) Similarity(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		similarity := h.voiceService.CosSimilarity(voice.PowerSpectrum, training.PowerSpectrum)
+		similarity, err := h.similarityService.CalcurateSimilarity(voice, &training)
 		response := new(SimilarityResponse)
-		response.ID = voice.ID
+		response.ID = similarity.ID
 		response.Name = voice.Name
 		response.TrainingName = training.Name
-		response.Similarity = int(similarity * 100)
+		response.Similarity = int(similarity.Similarity * 100)
 		response.Host = r.Header.Get("HOST")
 
 		template, err := createTemplate("result.html")
+		if err != nil {
+			panic(err)
+		}
+
+		err = template.Execute(w, response)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+type ShareResponse struct {
+	ID string
+	Name1ID string
+	Name1 string
+	Name2 string
+	Similarity int
+}
+
+func (h VoiceHandler) Share(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		ids, ok := r.URL.Query()["id"]
+
+		if !ok || len(ids[0]) < 1 {
+			log.Println("Url Param 'id' is missing")
+			return
+		}
+
+		id := ids[0]
+
+		similarity, err := h.similarityService.Get(id)
+		if err != nil {
+			panic(err)
+		}
+
+		response := new(ShareResponse)
+		response.ID = similarity.ID
+		response.Name1ID = similarity.Name1ID
+		response.Name1 = similarity.Name1
+		response.Name2 = similarity.Name2
+		response.Similarity = int(similarity.Similarity * 100)
+
+		template, err := createTemplate("share.html")
 		if err != nil {
 			panic(err)
 		}

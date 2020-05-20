@@ -30,7 +30,9 @@ func InitializeCLI(client *firestore.Client, ctx context.Context) (*src.CLI, err
 func InitializeServer(client *firestore.Client, ctx context.Context) (*src.Server, error) {
 	repositoryInterface := Voice.NewRepository(client, ctx)
 	serviceInterface := Voice.NewService(repositoryInterface)
-	voiceHandler := Handler.NewVoiceHandler(serviceInterface)
+	similarityRepositoryInterface := Similarity.NewRepository(client, ctx)
+	similarityServiceInterface := Similarity.NewService(similarityRepositoryInterface)
+	voiceHandler := Handler.NewVoiceHandler(serviceInterface, similarityServiceInterface)
 	server := src.NewServer(voiceHandler)
 	return server, nil
 }

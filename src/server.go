@@ -20,5 +20,6 @@ func (s Server) Start() {
 	http.HandleFunc("/", s.voiceHandler.Index)
 	http.HandleFunc("/register", s.voiceHandler.Register)
 	http.HandleFunc("/similarity", s.voiceHandler.Similarity)
+	http.HandleFunc("/share", s.voiceHandler.Share)
 	http.ListenAndServe(":8080", nil)
 }

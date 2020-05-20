@@ -7,6 +7,7 @@ import (
 
 type ServiceInterface interface {
 	CalcurateSimilarity(sample *Voice.Voice, training *Voice.Voice) (*Similarity, error)
+	Get(id string) (Similarity, error)
 }
 
 type Service struct {
@@ -27,6 +28,10 @@ func (s Service) CalcurateSimilarity(sample *Voice.Voice, training *Voice.Voice)
 	result.Name2 = training.Name
 	result.Similarity = cosSimilarity
 	return s.repository.Add(result)
+}
+
+func (s Service) Get(id string) (Similarity, error) {
+	return s.repository.Get(id)
 }
 
 func cosSimilarity(sample []float64, training []float64) float64 {

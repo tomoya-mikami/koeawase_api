@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>share</title>
+</head>
+
+<body>
+  <div>
+    {{.Name1}}さんと{{.Name2}}さんの声の類似度は{{.Similarity}}%です<br>
+
+    あなたも{{.Name1}}さんとどれくらい声が似ているか計測してみましょう<br>
+    好きな名前を入力して「こんばんわ」と言ってください
+  </div>
+  <form method="POST" action="/similarity" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="{{.Name1ID}}">
+    <input type="text" name="name" value="Hello" /><br>
+    <input type="file" name="voice" /><br>
+    <input type="submit" value="SUBMIT" />
+  </form>
+</body>
+
+</html>

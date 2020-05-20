@@ -31,6 +31,8 @@ func InitializeServer(client *firestore.Client, ctx context.Context) (*Src.Serve
 	wire.Build(
 		Voice.NewRepository,
 		Voice.NewService,
+		Similarity.NewRepository,
+		Similarity.NewService,
 		Handler.NewVoiceHandler,
 		Src.NewServer,
 	)
