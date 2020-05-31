@@ -11,13 +11,10 @@
     あなたと似ている声の友達を探しましょう<br>
     好きな名前を入力して「こんばんわ」と言ってください
   </div>
-  <form method="POST" action="/register" enctype="multipart/form-data">
+  <form id="registerForm" method="POST" action="/register" enctype="multipart/form-data">
     <input type="text" name="name" value="Hello" /><br>
-    <input type="file" name="voice" /><br>
-    <input type="submit" value="SUBMIT" />
   </form>
 
-  <!-- 録音テスト -->
   <div id="buttons">
     <button id="record">Record</button>
     <button id="stop">Stop</button>
@@ -27,6 +24,7 @@
       const record = document.getElementById('record');
       const stop = document.getElementById('stop');
       const downloadLink = document.getElementById('download');
+      const registerForm = document.getElementById('registerForm');
 
       let audioData = []; // 録音データ
 
@@ -77,6 +75,9 @@
             stop.disabled = true;
             record.disabled = false;
             audioContext.close();
+
+            registerForm.append('voice', blob);
+            registerForm.submit();
           }
 
           // 録音開始
