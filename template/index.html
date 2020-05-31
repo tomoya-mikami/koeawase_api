@@ -16,6 +16,157 @@
     <input type="file" name="voice" /><br>
     <input type="submit" value="SUBMIT" />
   </form>
+
+  <!-- 録音テスト -->
+  <div id="buttons">
+    <button id="record">Record</button>
+    <button id="stop">Stop</button>
+    <a id="download">Download</a>
+  </div>
+  <script>
+      const record = document.getElementById('record');
+      const stop = document.getElementById('stop');
+      const downloadLink = document.getElementById('download');
+
+      let audioData = []; // 録音データ
+
+      // getUserMediaの有効かの確認
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+
+        const constraints = { audio: true };
+        
+        let onSuccess = function (stream) {
+          // audioContextを使った録音方法
+          // 参考 https://qiita.com/optimisuke/items/f1434d4a46afd667adc6
+          // https://qiita.com/taisei_goto/items/a4f7c94cb9619fe7c7a6
+          const audioContext = new AudioContext();
+          sampleRate = audioContext.sampleRate;
+
+          // ストリームを合成するNodeを作成
+          const mediaStreamDestination = audioContext.createMediaStreamDestination();
+
+          // マイクのstreamをMediaStreamNodeに入力
+          const audioSource = audioContext.createMediaStreamSource(stream);
+          audioSource.connect(mediaStreamDestination);
+
+          // マイクと接続先を合成したMediaStreamを取得
+          const composedMediaStream = mediaStreamDestination.stream;
+          // マイクと接続先を合成したMediaStreamSourceNodeを取得
+          const composedAudioSource = audioContext.createMediaStreamSource(composedMediaStream);
+
+          // 音声のサンプリングをするNodeを作成
+          const audioProcessor = audioContext.createScriptProcessor(1024, 1, 1);
+          // マイクと接続先を合成した音声をサンプリング
+          composedAudioSource.connect(audioProcessor);
+
+          audioProcessor.addEventListener('audioprocess', event => {
+            audioData.push(event.inputBuffer.getChannelData(0).slice());
+          });
+
+          // stopボタンを押した際にblobに変換する
+          const uploadMedia = function () {
+            const waveBuffer = exportWave(audioData);
+            const blob = new Blob([waveBuffer], { 'type': 'audio/wav' });
+            const myURL = window.URL || window.webkitURL;
+            const url = myURL.createObjectURL(blob);
+            downloadLink.href = url;
+            downloadLink.download = 'test.wav';
+            downloadLink.click();
+            audioData = [];
+
+            stop.disabled = true;
+            record.disabled = false;
+            audioContext.close();
+          }
+
+          // 録音開始
+          record.onclick = function () {
+            audioProcessor.connect(audioContext.destination);
+            console.log("recorder started");
+            record.style.background = "red";
+
+            stop.disabled = false;
+            record.disabled = true;
+          }
+
+          // 録音停止
+          stop.onclick = uploadMedia;
+        }
+
+        const onError = function (err) {
+          console.log('The following error occured: ' + err);
+        }
+
+        navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
+      } else {
+        console.log('getUserMedia not supported on your browser!');
+      }
+
+      // waveに録音したデータを変換する
+      const exportWave = function (audioData) {
+        // Float32Arrayの配列になっているので平坦化
+        const audioWaveData = flattenFloat32Array(audioData);
+        // WAVEファイルのバイナリ作成用のArrayBufferを用意
+        const buffer = new ArrayBuffer(44 + audioWaveData.length * 2);
+
+        // ヘッダと波形データを書き込みWAVEフォーマットのバイナリを作成
+        const dataView = writeWavHeaderAndData(new DataView(buffer), audioWaveData, sampleRate);
+
+        return buffer;
+      }
+
+      // Float32Arrayを平坦化する
+      const flattenFloat32Array = function(matrix) {
+        const arraySize = matrix.reduce((acc, arr) => acc + arr.length, 0);
+        let resultArray = new Float32Array(arraySize);
+        let count = 0;
+        for (let i = 0; i < matrix.length; i++) {
+          for (let j = 0; j < matrix[i].length; j++) {
+            resultArray[count] = audioData[i][j];
+            count++;
+          }
+        }
+        return resultArray;
+      }
+
+      // ArrayBufferにstringをoffsetの位置から書き込む
+      const writeStringForArrayBuffer = function(view, offset, str) {
+        for (let i = 0; i < str.length; i++) {
+          view.setUint8(offset + i, str.charCodeAt(i));
+        }
+      }
+
+      // 波形データをDataViewを通して書き込む
+      const floatTo16BitPCM = function(view, offset, audioWaveData) {
+        for (let i = 0; i < audioWaveData.length; i++, offset += 2) {
+          let s = Math.max(-1, Math.min(1, audioWaveData[i]));
+          view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+        }
+      }
+
+      // モノラルのWAVEヘッダを書き込む
+      const writeWavHeaderAndData = function(view, audioWaveData, samplingRate) {
+        // WAVEのヘッダを書き込み(詳しくはWAVEファイルのデータ構造を参照)
+        writeStringForArrayBuffer(view, 0, 'RIFF'); // RIFF識別子
+        view.setUint32(4, 36 + audioWaveData.length * 2, true); // チャンクサイズ(これ以降のファイルサイズ)
+        writeStringForArrayBuffer(view, 8, 'WAVE'); // フォーマット
+        writeStringForArrayBuffer(view, 12, 'fmt '); // fmt識別子
+        view.setUint32(16, 16, true); // fmtチャンクのバイト数(第三引数trueはリトルエンディアン)
+        view.setUint16(20, 1, true); // 音声フォーマット。1はリニアPCM
+        view.setUint16(22, 1, true); // チャンネル数。1はモノラル。
+        view.setUint32(24, samplingRate, true); // サンプリングレート
+        view.setUint32(28, samplingRate * 2, true); // 1秒あたりのバイト数平均(サンプリングレート * ブロックサイズ)
+        view.setUint16(32, 2, true); // ブロックサイズ。チャンネル数 * 1サンプルあたりのビット数 / 8で求める。モノラル16bitなら2。
+        view.setUint16(34, 16, true); // 1サンプルに必要なビット数。16bitなら16。
+        writeStringForArrayBuffer(view, 36, 'data'); // サブチャンク識別子
+        view.setUint32(40, audioWaveData.length * 2, true); // 波形データのバイト数(波形データ1点につき16bitなのでデータの数 * 2となっている)
+
+        // WAVEのデータを書き込み
+        floatTo16BitPCM(view, 44, audioWaveData); // 波形データ
+
+        return view;
+      }
+  </script>
 </body>
 
 </html>
